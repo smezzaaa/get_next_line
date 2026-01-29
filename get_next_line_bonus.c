@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: smeza-ro <smeza-ro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 12:28:22 by smeza-ro          #+#    #+#             */
-/*   Updated: 2026/01/29 19:51:35 by smeza-ro         ###   ########.fr       */
+/*   Updated: 2026/01/29 20:00:39 by smeza-ro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*ft_strjoin(char *s1, char *s2)
 {
@@ -70,39 +70,26 @@ char	*get_next_line(int fd)
 {
 	char		*buff;
 	ssize_t		rd;
-	static char	*stash;
+	static char	*stash[4096];
 	char		*line;
 
 	rd = 1;
 	line = NULL;
-	while (rd > 0 && !ft_strchr(stash, '\n'))
+	while (rd > 0 && !ft_strchr(stash[fd], '\n'))
 	{
 		buff = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
 		if (!buff)
-			return (ft_free(stash, buff));
+			return (ft_free(stash[fd], buff));
 		rd = read(fd, (void *)buff, BUFFER_SIZE);
 		if (rd < 0)
-			return (ft_free(stash, buff));
+			return (ft_free(stash[fd], buff));
 		buff[rd] = '\0';
-		if (!stash && rd != 0)
-			stash = ft_strdup(buff);
+		if (!stash[fd] && rd != 0)
+			stash[fd] = ft_strdup(buff);
 		else
-			stash = ft_strjoin(stash, buff);
+			stash[fd] = ft_strjoin(stash[fd], buff);
 		free (buff);
 		buff = NULL;
 	}
-	return (ft_return(&stash));
+	return (ft_return(&stash[fd]));
 }
-/* 
-int main ()
-{
-	int fd;
-	fd = open("doc.txt", O_RDONLY);
-	char *line = get_next_line(fd);
-	while (line)
-	{
-		printf ("%s", line);
-		free (line);
-		line = get_next_line(fd);
-	}
-} */
